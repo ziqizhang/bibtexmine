@@ -1,0 +1,4 @@
+crossrefapi
+requests
+habanero
+lxml
