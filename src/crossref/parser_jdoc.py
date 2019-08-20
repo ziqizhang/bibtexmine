@@ -75,18 +75,20 @@ def extract_fulltext(xml, outfolder, filename):
                 else:
                     out_string="<sec>\n"
 
+                outf.write(out_string)
                 # section content
-                sec_para = xml.xpath("//body/sec[" + str(i) + "]/p")
+                sec_para = xml.xpath("//body/sec[" + str(i) + "]//text()")
                 if len(sec_para)<1:
                     continue
-                for j in range(1, len(sec_para) + 1):
-                    text = xml.xpath(
-                        'string(//body/sec[' + str(i) + ']/p[' + str(j) + '])').strip()
-                    if len(text)>1:
-                        text="<p>"+escape(text)+"</p>\n"
-                    out_string+=text
+                text = "".join(sec_para).strip()
+                # for j in range(1, len(sec_para) + 1):
+                #     text = xml.xpath(
+                #         'string(//body/sec[' + str(i) + ']/p[' + str(j) + '])').strip()
+                #     if len(text)>1:
+                #         text="<p>"+escape(text)+"</p>\n"
+                #     out_string+=text
 
-                outf.write(out_string)
+                outf.write(escape(text))
                 outf.write("</sec>\n")
             outf.write("</doc>")
             outf.close()
@@ -101,7 +103,7 @@ if __name__ == "__main__":
     for f in file_list:
         filename = f.split("/")[-1] + '.txt'
 
-        if 'A critical review ' in filename:
+        if 'model of uncertainty ' in filename:
             print()
         print("processing file "+f)
         # try:

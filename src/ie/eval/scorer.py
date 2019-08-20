@@ -6,6 +6,8 @@ def read_gs(in_file, col, max_rows=None):
         csvreader = csv.reader(csvfile, delimiter=',')
         count=0
         for row in csvreader:
+            if "An empirical study of the information seeking behavior of practicing visual artists" in [row[0]]:
+                print()
             count += 1
             if max_rows is not None and count>max_rows:
                 break
@@ -76,7 +78,8 @@ def score(gs:dict, pred:dict, match_all=False):
             pred_all+=1
 
         shared=len(set(multi_gs).intersection(multi_pred))
-
+        if shared==0:
+            print("\t {}, gs={}, pred={}".format(i, gs_l, pred_l))
         if match_all:
             correct+=shared
         else:
@@ -92,13 +95,39 @@ def score(gs:dict, pred:dict, match_all=False):
 
 
 if __name__ == "__main__":
+    print("ZZ")
     #when multiple predictions, keep all; when multiple gs, keep all
-    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/jdoc_ZZ.csv", 6, max_rows=506)
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6, max_rows=508)
     pred=read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv",4,take_all=True)
     score(gs,pred,match_all=True)
 
     # when multiple predictions, keep the highest; when multiple gs, as long as one matches
-    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/jdoc_ZZ.csv", 6, max_rows=506)
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6, max_rows=508)
     pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv", 4, take_all=False)
+    score(gs, pred, match_all=False)
+
+    print("AC")
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_AC.csv", 6, max_rows=348)
+    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc_.csv", 4,
+                           take_all=True)
+    score(gs, pred, match_all=True)
+
+    # when multiple predictions, keep the highest; when multiple gs, as long as one matches
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_AC.csv", 6, max_rows=348)
+    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc_.csv", 4,
+                           take_all=False)
+    score(gs, pred, match_all=False)
+
+    print("WT")
+    # when multiple predictions, keep all; when multiple gs, keep all
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT.csv", 7, max_rows=653)
+    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv", 4,
+                           take_all=True)
+    score(gs, pred, match_all=True)
+
+    # when multiple predictions, keep the highest; when multiple gs, as long as one matches
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT.csv", 7, max_rows=653)
+    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv", 4,
+                           take_all=False)
     score(gs, pred, match_all=False)
 

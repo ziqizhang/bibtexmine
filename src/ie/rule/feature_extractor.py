@@ -98,6 +98,8 @@ def find_all_sections(parsed_xml_root_el, gazetteer_keywords: {} = None, gazette
                 p = re.sub('[^0-9a-zA-Z]+', ' ', p.text.lower())
                 p = ' '.join(p.split())
                 text += p + " "
+            if para == None or len(para) == 0:
+                text = "".join(s.xpath("text()")).strip()
         return text, method_section is not None, titles.lower().strip()
     elif method_section is not None:
         para = method_section.xpath("p")
@@ -107,6 +109,9 @@ def find_all_sections(parsed_xml_root_el, gazetteer_keywords: {} = None, gazette
             p = re.sub('[^0-9a-zA-Z]+', ' ', p.text.lower())
             p = ' '.join(p.split())
             text += p + " "
+
+        if para==None or len(para)==0:
+            text = "".join(method_section.xpath("text()")).strip()
         return text, method_section is not None, titles.lower().strip()
     else:
         return text, method_section is not None, titles.lower().strip()
@@ -275,6 +280,9 @@ def extract_features(abstract_folder, full_text_folder, gazetter_file, outfile, 
         for paper_title in titles:
             print("processing article=" + paper_title)
 
+            if 'An empirical study of the information seeking behavior of practicing visual artists' in paper_title:
+                print()
+
             #check length of article
             fulltext_file = full_text_folder + "/" + paper_title + file_ext
             if not os.path.isfile(fulltext_file):
@@ -386,15 +394,15 @@ if __name__ == "__main__":
 
     extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/abstract",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver5.xml",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv",".xml.txt")
 
     extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/abstract",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/full",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver5.xml",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv",".xml.txt")
 
     extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/jasist_html_parsed/abstract",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/jasist_html_parsed/full_text",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver5.xml",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jasist.csv",".txt")
