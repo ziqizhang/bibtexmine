@@ -132,6 +132,13 @@ def find_abstract_section(parsed_xml_root_el):
         return text
     return None
 
+def find_doi(parsed_xml_root_el):
+    secs = parsed_xml_root_el.xpath("doi")
+    if secs is not None and len(secs) == 1:
+        return secs[0].text.strip()
+
+    return None
+
 
 # count keyword frequencies in the 'method' section
 def count_feature_freq(text, gazetteer_keywords: {} = None, gazetteer_patterns: {} = None):
@@ -245,6 +252,11 @@ def post_classify_refine(line_decision):
     return line_decision
 
 
+def output_doi(doi, writer):
+    if doi.startswith("http"):
+        writer.write(doi+"\n")
+    else:
+        writer.write("https://doi.org/"+doi+"\n")
 
 
 def extract_features(abstract_folder, full_text_folder, gazetter_file, outfile, file_ext):
@@ -273,15 +285,14 @@ def extract_features(abstract_folder, full_text_folder, gazetter_file, outfile, 
     header = ["Article", "hasMethodSection", "GeneralType", "ContentPart", "Features", "Sum", "Label", "Comment"]
 
     count = 0
+    doi_writer=open("doi.txt",'w',newline="\n")
+
     with open(outfile, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(header)
 
         for paper_title in titles:
             print("processing article=" + paper_title)
-
-            if 'An empirical study of the information seeking behavior of practicing visual artists' in paper_title:
-                print()
 
             #check length of article
             fulltext_file = full_text_folder + "/" + paper_title + file_ext
@@ -307,6 +318,7 @@ def extract_features(abstract_folder, full_text_folder, gazetter_file, outfile, 
             line_title[4] = title_matches
             line_title[5] = title_matches_sum
 
+            doi=""
             # match abstract
             abstract_file = abstract_folder + "/" + paper_title + file_ext
             abstract_matches = None
@@ -319,9 +331,12 @@ def extract_features(abstract_folder, full_text_folder, gazetter_file, outfile, 
                                                                                         gazetteer_patterns=gazetteer_pattern)
                 line_abs[4] = abstract_matches
                 line_abs[5] = abstract_matches_sum
+                # extract doi from body text
+                doi = find_doi(tree)
             else:
                 line_abs[4] = "n/a"
                 line_abs[5] = "0"
+
 
             # match full text
             method_matches = None
@@ -354,6 +369,11 @@ def extract_features(abstract_folder, full_text_folder, gazetter_file, outfile, 
                 line_full[4] = full_matches
                 line_full[5] = full_matches_sum
 
+                #extract doi from body text
+                if doi is None or doi=="":
+                    doi = find_doi(tree)
+
+            output_doi(doi,doi_writer)
             # classify into theory, methodological, empirical, also decision which of title, abs, method, full text to use for decision
 
             general_type, decision_index = \
@@ -382,7 +402,7 @@ def extract_features(abstract_folder, full_text_folder, gazetter_file, outfile, 
             writer.writerow(line_full)
 
         print("finished")
-
+        doi_writer.close()
 
 if __name__ == "__main__":
 
@@ -401,7 +421,7 @@ if __name__ == "__main__":
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/full",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv",".xml.txt")
-
+    #
     extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/jasist_html_parsed/abstract",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/jasist_html_parsed/full_text",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",

@@ -12,7 +12,7 @@ works = Works()
 journals = Journals()
 cr = Crossref()
 
-# ISSN for JASIS -> issn=2330-1643
+# ISSN for JASIS -> issn=2330-1643, 1532-2882 for print and  1532-2890 for online
 # ISSN for JDOC -> issn=0022-0418
 # ISSN for LISR -> issn=0740-8188
 x = cr.journals(ids = "0740-8188", works =True,
