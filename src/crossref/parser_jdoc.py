@@ -8,10 +8,27 @@ import os
 from lxml import etree
 from xml.sax.saxutils import escape
 
+types={}
 
 def parse(in_file, xml_parser: ET.XMLParser):
     return ET.parse(in_file, parser=xml_parser).getroot()
     #pass
+
+def check_article_type(xml):
+    type=xml.xpath("string(//article-meta/article-categories/subj-group/subj-group[@subj-group-type='type-of-article'])")
+    type=type.strip()
+    if len(type)==0:
+        type = xml.xpath(
+            "string(//compound-subject-part[@content-type='label'])")
+        type = type.strip()
+
+    if type in types:
+        types[type]+=1
+    else:
+        types[type]=1
+
+    return type.lower()=="research paper" or type.lower()=="literature review" or\
+        type.lower()=="case study"
 
 def extract_doi(xml):
     doi=xml.xpath("string(//article-meta/article-id[@pub-id-type='doi'])")
@@ -111,6 +128,12 @@ if __name__ == "__main__":
         count += 1
         tree = parse(f, parser)
         # print(root[0][6].text)
+        is_article = check_article_type(tree)
+        if not is_article:
+            print("\tthis is not a research article, skipped")
+            continue
+
+
         print("\textracting abstract...")
         extract_abstract(tree, out_folder, filename)
         print("\textracting full text...")
@@ -119,3 +142,5 @@ if __name__ == "__main__":
 
         #
         print("finished")
+
+    print(types)

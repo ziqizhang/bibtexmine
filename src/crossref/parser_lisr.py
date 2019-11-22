@@ -9,6 +9,7 @@ import os
 from lxml import etree
 from xml.sax.saxutils import escape
 
+types={}
 
 def parse(in_file, xml_parser: ET.XMLParser):
     return ET.parse(in_file, parser=xml_parser).getroot()
@@ -21,6 +22,11 @@ def check_article_type(xml, namespaces:dict):
         return False
     else:
         if subtype is not None:
+            if subtype in types:
+                types[subtype] += 1
+            else:
+                types[subtype] = 1
+
             return type.lower()=="article" and subtype.lower()=="fla"
         else:
             return type.lower()=="article"
@@ -146,3 +152,5 @@ if __name__ == "__main__":
     print(count_research_articles)
     for f in failed:
         print(f)
+
+    print(types)
