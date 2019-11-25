@@ -28,6 +28,7 @@ def check_article_type(xml):
             "string(//compound-subject-part[@content-type='label'])")
         type = type.strip()
 
+    print("\tarticle type="+type)
     if type in types:
         types[type]+=1
     else:
@@ -145,7 +146,7 @@ if __name__ == "__main__":
 
         if 'model of uncertainty ' in filename:
             print()
-        print("processing file "+f)
+        print("processing file="+f)
         # try:
         # print(f)
         count += 1

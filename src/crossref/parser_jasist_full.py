@@ -41,6 +41,8 @@ for f in file_list:
 
         type=root.find_class("doi-access-container clearfix")[0].text_content().lower()
         type=type.split("\n")[0].strip()
+        print("processing file="+f)
+        print("\t article type="+type)
         if type in types:
             types[type] += 1
         else:

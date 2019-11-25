@@ -1,13 +1,12 @@
 import csv
+import os
 
-def read_gs(in_file, col, max_rows=None, keep=None):
+def read_gs(in_file, col, max_rows=None, keepcls=None, keepfiles=None):
     annotations={}
     with open(in_file) as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',')
         count=0
         for row in csvreader:
-            if "An empirical study of the information seeking behavior of practicing visual artists" in [row[0]]:
-                print()
             count += 1
             if max_rows is not None and count>max_rows:
                 break
@@ -18,8 +17,10 @@ def read_gs(in_file, col, max_rows=None, keep=None):
                 continue
 
             ann = row[col].strip()
-            if keep is not None:
-                ann=replace_with_other(ann, keep)
+            if keepcls is not None:
+                ann=replace_with_other(ann, keepcls)
+            if keepfiles is not None and not row[0] in keepfiles:
+                continue
             annotations[row[0]]=ann
 
     return annotations
@@ -40,7 +41,7 @@ def replace_with_other(pred_, keep):
     return string[0:-1].strip()
 
 
-def read_prediction(in_file, col, take_all=False,keep=None):
+def read_prediction(in_file, col, keepcls=None, keepfiles=None):
     predictions = {}
     with open(in_file) as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',')
@@ -54,15 +55,15 @@ def read_prediction(in_file, col, take_all=False,keep=None):
             pred=row[col]
 
             pred_ = ""
-            if take_all:
-                for p in pred.split("|"):
-                    pred_+=p.split("=")[0]+","
-                pred_ = pred_[:-1]
-            else:
-                pred_=pred.split("|")[0].split("=")[0]
 
-            if keep is not None:
-                pred_ = replace_with_other(pred_, keep)
+            for p in pred.split("|"):
+                pred_+=p.split("=")[0]+","
+            pred_ = pred_[:-1]
+
+            if keepcls is not None:
+                pred_ = replace_with_other(pred_, keepcls)
+            if keepfiles is not None and not row[0] in keepfiles:
+                continue
             predictions[row[0]] = pred_
     return predictions
 
@@ -94,10 +95,10 @@ def score(gs:dict, pred:dict, match_all=False):
 
         # if len(multi_pred)>1:
         #     print("")
-        if match_all:
-            pred_all+=len(multi_pred)
-        else:
-            pred_all+=1
+        # if match_all:
+        #     pred_all+=len(multi_pred)
+        # else:
+        #     pred_all+=1
 
         shared=len(set(multi_gs).intersection(multi_pred))
         if shared==0:
@@ -108,6 +109,17 @@ def score(gs:dict, pred:dict, match_all=False):
             if shared>0:
                 correct+=1
 
+        if shared!=len(multi_pred) or shared!=len(multi_gs):
+            print("article={}, gs={}, pred={}".format(i, multi_gs, multi_pred))
+
+    for k, v in pred.items():
+        pred_l = v
+        multi_pred = split_by_comma(pred_l)
+        if match_all:
+            pred_all+=len(multi_pred)
+        else:
+            pred_all+=1
+
     if pred_all==0 or gs_all==0:
         p=0
         r=0
@@ -115,7 +127,10 @@ def score(gs:dict, pred:dict, match_all=False):
     else:
         p=correct/pred_all
         r=correct / gs_all
-        f1=2*p*r/(p+r)
+        if p==0 and r==0:
+            f1=0
+        else:
+            f1=2*p*r/(p+r)
     # print("precision={}".format(p))
     # print("recall={}".format(r))
     # print("f1={}".format(f1))
@@ -158,6 +173,16 @@ def split_by_comma(string):
         res.append(s.strip())
     return res
 
+
+def load_files2keep(file_folder):
+    files=[]
+    for f in os.listdir(file_folder):
+        name=f[0:f.index(".")].strip()
+        files.append(name)
+
+    return files
+
+
 if __name__ == "__main__":
     # print("ZZ")
     # #when multiple predictions, keep all; when multiple gs, keep all
@@ -181,36 +206,58 @@ if __name__ == "__main__":
     # pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc_.csv", 4,
     #                        take_all=False)
     # score(gs, pred, match_all=False)
-    keep=["questionnaire","interview","scientometric","theory"]
+
+
+    #keep some classes
+    keep_classes = ["questionnaire", "interview", "scientometric", "theory"]
+    #keep all classes
+    # keep_classes=["questionnaire", "interview", "scientometric", "theory",
+    #               "systematic review","network analysis","information retrieval","classification",
+    #               "clustering","information extraction","topic modelling","sentiment analysis",
+    #               "content analysis","observation","delphi study","ethnography/field study",
+    #               "netnography","experiment","focus group","historical method",
+    #               "document analysis","research diary/journal","think aloud protocol","transaction log analysis",
+    #               "user study","webometrics","social media data analysis","mixed method",
+    #               "action research","usability testing"]
 
     print("jdoc")
+    files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full"
+    keep_files = load_files2keep(files)
     print(">>> match_all=True")
     #when multiple predictions, keep all; when multiple gs, keep all
-    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6, max_rows=508, keep=keep)
-    pred=read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv",4,take_all=True, keep=keep)
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6,
+                 max_rows=508, keepcls=keep_classes, keepfiles=keep_files)
+    pred=read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv", 4,
+                         keepcls=keep_classes, keepfiles=list(gs.keys()))
     score_per_type(gs,pred,match_all=True)
 
     print(">>> match_all=False")
     # when multiple predictions, keep the highest; when multiple gs, as long as one matches
-    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6, max_rows=508, keep=keep)
-    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv", 4, take_all=False, keep=keep)
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6,
+                 max_rows=508, keepcls=keep_classes, keepfiles=keep_files)
+    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv", 4,
+                           keepcls=keep_classes, keepfiles=list(gs.keys()))
     score_per_type(gs, pred, match_all=False)
     print()
 
     print("lisr")
+    files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/full"
+    keep_files = load_files2keep(files)
     print(">>> match_all=True")
     # when multiple predictions, keep all; when multiple gs, keep all
-    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT_AC.csv", 6, max_rows=653, keep=keep)
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT_AC.csv", 6, max_rows=653,
+                 keepcls=keep_classes, keepfiles=keep_files)
     pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv", 4,
-                           take_all=True, keep=keep)
+                           keepcls=keep_classes, keepfiles=list(gs.keys()))
     #score(gs, pred, match_all=True)
     score_per_type(gs, pred, match_all=True)
 
     print(">>> match_all=False")
     # when multiple predictions, keep the highest; when multiple gs, as long as one matches
-    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT_AC.csv", 6, max_rows=653, keep=keep)
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT_AC.csv", 6, max_rows=653,
+                 keepcls=keep_classes, keepfiles=keep_files)
     pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv", 4,
-                           take_all=False, keep=keep)
+                           keepcls=keep_classes, keepfiles=list(gs.keys()))
     #score(gs, pred, match_all=False)
     score_per_type(gs, pred, match_all=False)
 

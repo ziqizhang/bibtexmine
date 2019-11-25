@@ -27,6 +27,7 @@ def check_article_type(xml, namespaces:dict):
     if type is None:
         return False
     else:
+        print("\tarticle type="+subtype)
         if subtype is not None:
             if subtype in types:
                 types[subtype] += 1
@@ -135,7 +136,7 @@ if __name__ == "__main__":
             print("stop")
         try:
             filename = f.split("/")[-1].strip() + '.txt'
-            print("processing file "+filename)
+            print("processing file="+filename)
             # try:
             # print(f)
             count += 1
