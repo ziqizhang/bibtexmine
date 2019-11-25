@@ -11,12 +11,15 @@ types={}
 def parse(in_file, xml_parser: ET.XMLParser):
     return ET.parse(in_file, parser=html_parser)
 
+def check_article_type(type):
+    return type.lower()=='research article'
+
 # full
 file_list = glob.glob('/home/zz/Cloud/GDrive/ziqizhang/project/'
-                      'sure2019/data/extracted_data/JASIST_(issn_2330-1635)/jasist_html_parsed/html/*.html')
-out_folder='/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/tmp/'
+                      'sure2019/data/extracted_data/JASIST_(issn_2330-1635)/html/*.html')
+out_folder='/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/full/'
 
-count = 0
+count_passed = 0
 count_non_html=0
 count_no_ful=0
 count_other_error=0
@@ -29,12 +32,16 @@ for f in file_list:
             count_non_html += 1
             continue
 
-        type=root.find_class("doi-access-container clearfix")[0].text_content()
+        type=root.find_class("doi-access-container clearfix")[0].text_content().lower()
         type=type.split("\n")[0].strip()
         if type in types:
             types[type] += 1
         else:
             types[type] = 1
+
+        if not check_article_type(type):
+            continue
+        count_passed+=1
 
         try:
             element = root.find_class("article-section article-section__full")
@@ -50,6 +57,8 @@ for f in file_list:
         outf = ""
         for i in full_text[:-1]:
             # print ("line -> ", i)
+            if len(i)<1:
+                continue
             title = '\n<sec title=' + '"' + i[0].text_content() + '">\n'
             outf = outf + title
             for j in i[1:]:
@@ -66,9 +75,13 @@ for f in file_list:
                         "</doc>").encode("utf-8"))
             print("passed")
 
-    except:
+    except TypeError:
         print('\terr at <> ')
         count_other_error += 1
 
+
+
+
 print(types)
-print('Not html {}, no abstract {}, other error {}'.format(count_non_html, count_no_ful, count_other_error))
+print('Not html {}, no full text {}, other error {}'.format(count_non_html, count_no_ful, count_other_error))
+print(count_passed)

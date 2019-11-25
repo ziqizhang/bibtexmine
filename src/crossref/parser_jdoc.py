@@ -27,8 +27,7 @@ def check_article_type(xml):
     else:
         types[type]=1
 
-    return type.lower()=="research paper" or type.lower()=="literature review" or\
-        type.lower()=="case study"
+    return type.lower()=="research paper"
 
 def extract_doi(xml):
     doi=xml.xpath("string(//article-meta/article-id[@pub-id-type='doi'])")
@@ -68,7 +67,23 @@ def extract_abstract(xml, outfolder, filename):
 
             outf.write("</doc>")
             outf.close()
-
+    else:
+        abs_text = xml.xpath("string(//front/article-meta/abstract)")
+        if len(abs_text)>0:
+            outfilename = outfolder + "/abstract/" + filename
+            with open(outfilename, 'w',encoding="utf-8") as outf:
+                outf.write("<doc>")
+                outf.write("<doi>"+doi+"</doi>\n")
+                #outf.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+                #for each section
+                out_string="<sec>\n"
+                out_string+=escape(abs_text)+"\n"
+                outf.write(out_string)
+                outf.write("</sec>\n")
+                outf.write("</doc>")
+                outf.close()
+        else:
+            print("\tNO ABSTRACT")
 
 
 def extract_fulltext(xml, outfolder, filename):

@@ -10,10 +10,12 @@ types={}
 def parse(in_file, xml_parser: ET.XMLParser):
     return ET.parse(in_file, parser=xml_parser)
 
+def check_article_type(type):
+    return type.lower()=='research article'
 
 file_list = glob.glob('/home/zz/Cloud/GDrive/ziqizhang/project/'
-                      'sure2019/data/extracted_data/JASIST_(issn_2330-1635)/jasist_html_parsed/html/*.html')
-out_folder='/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/tmp/'
+                      'sure2019/data/extracted_data/JASIST_(issn_2330-1635)/html/*.html')
+out_folder='/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/abstract/'
 
 count = 0
 count_non_html=0
@@ -30,12 +32,14 @@ for f in file_list:
             count_non_html += 1
             continue
 
-        type=root.find_class("doi-access-container clearfix")[0].text_content()
+        type=root.find_class("doi-access-container clearfix")[0].text_content().lower()
         type=type.split("\n")[0].strip()
         if type in types:
             types[type] += 1
         else:
             types[type] = 1
+        if not check_article_type(type):
+            continue
 
         try:
             element = root.get_element_by_id("section-1-en")

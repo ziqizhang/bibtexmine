@@ -29,7 +29,7 @@ def check_article_type(xml, namespaces:dict):
 
             return type.lower()=="article" and subtype.lower()=="fla"
         else:
-            return type.lower()=="article"
+            return False
 
 def extract_doi(xml,namespaces:dict):
     doi=xml.xpath("string(//dtd:coredata/prism:doi)",namespaces=namespaces)
