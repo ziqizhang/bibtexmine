@@ -10,6 +10,12 @@ from lxml import etree
 from xml.sax.saxutils import escape
 
 types={}
+dois=[]
+
+def save_doi(outfile, dois):
+    with open(outfile, 'w', encoding="utf-8") as outf:
+        for d in dois:
+            outf.write("https://doi.org/"+d+"\n")
 
 def parse(in_file, xml_parser: ET.XMLParser):
     return ET.parse(in_file, parser=xml_parser).getroot()
@@ -61,15 +67,16 @@ def extract_abstract(xml, outfolder, filename, namespaces:dict):
 def extract_para_of_section(sec):
     out_string=""
     para = sec.xpath("*[local-name()='para']")
-    if len(para) < 1:
-        subsecs=sec.xpath("*[local-name()='section']")
-        for s in subsecs:
-            out_string+= extract_para_of_section(s)
+
     for j in range(0, len(para)):
         text = ''.join(para[j].itertext()).strip()
         if len(text) > 1:
             text = "<p>" + escape(text) + "</p>\n"
         out_string += text
+
+    subsecs=sec.xpath("*[local-name()='section']")
+    for s in subsecs:
+        out_string+= extract_para_of_section(s)
     return out_string
 
 def extract_fulltext(xml, outfolder, filename,namespaces:dict):
@@ -78,6 +85,7 @@ def extract_fulltext(xml, outfolder, filename,namespaces:dict):
     #the 'article' element uses a namespace that overwrites default, we have to deal with it separately.
     original_text_article_element=xml.xpath('//*[local-name() = "article"]')
     if len(original_text_article_element)>0:
+        dois.append(doi)
         body_secs = original_text_article_element[0].xpath("//*[local-name()='body']/*[local-name()='sections']")
         if body_secs is not None and len(body_secs)>0 and len(body_secs[0]) > 0:
             outfilename = outfolder + "/full/" + filename
@@ -123,7 +131,7 @@ if __name__ == "__main__":
     failed=set()
     count_research_articles=0
     for f in file_list:
-        if "social bookmarking" in f.lower():
+        if "information seeking of coll" in f.lower():
             print("stop")
         try:
             filename = f.split("/")[-1].strip() + '.txt'
@@ -154,3 +162,5 @@ if __name__ == "__main__":
         print(f)
 
     print(types)
+
+    save_doi(sys.argv[3], dois)

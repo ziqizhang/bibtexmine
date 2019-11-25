@@ -4,9 +4,16 @@ import sys
 import os
 from lxml import html
 from lxml.html import html_parser
+from xml.sax.saxutils import escape
 
 # doc @https://lxml.de/lxmlhtml.html
 types={}
+dois=[]
+
+def save_doi(outfile, dois):
+    with open(outfile, 'w', encoding="utf-8") as outf:
+        for d in dois:
+            outf.write(d+"\n")
 
 def parse(in_file, xml_parser: ET.XMLParser):
     return ET.parse(in_file, parser=html_parser)
@@ -50,7 +57,8 @@ for f in file_list:
             count_no_ful+=1
             continue
 
-        doi = "\n<doi> " + root.find_class("epub-doi")[0].text_content() + "</doi>"
+        doi_str=root.find_class("epub-doi")[0].text_content().strip()
+        doi = "\n<doi> " + doi_str + "</doi>"
         full_text = element[0]
         file_name = out_folder + f.split("/")[-1] + ".xml"
 
@@ -59,12 +67,13 @@ for f in file_list:
             # print ("line -> ", i)
             if len(i)<1:
                 continue
-            title = '\n<sec title=' + '"' + i[0].text_content() + '">\n'
+            title = '\n<sec title=' + '"' + escape(i[0].text_content()) + '">\n'
             outf = outf + title
             for j in i[1:]:
                 count = 0
-                paragraph = ("\n<p>" + j.text_content().strip() + "</p>")
+                paragraph = ("\n<p>" + escape(j.text_content().strip()) + "</p>")
                 outf += paragraph
+            outf+="</sec>"
         #         print("length = " , len("<p>" + j.text_content() + "</p>\n"))
         with open((file_name), 'wb+') as file:
             # print(i['link'][1]['URL'])
@@ -74,6 +83,7 @@ for f in file_list:
                          "\n" + outf + \
                         "</doc>").encode("utf-8"))
             print("passed")
+        dois.append(doi_str)
 
     except TypeError:
         print('\terr at <> ')
@@ -85,3 +95,4 @@ for f in file_list:
 print(types)
 print('Not html {}, no full text {}, other error {}'.format(count_non_html, count_no_ful, count_other_error))
 print(count_passed)
+save_doi(sys.argv[1], dois)

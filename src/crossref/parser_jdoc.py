@@ -9,6 +9,12 @@ from lxml import etree
 from xml.sax.saxutils import escape
 
 types={}
+dois=[]
+
+def save_doi(outfile, dois):
+    with open(outfile, 'w', encoding="utf-8") as outf:
+        for d in dois:
+            outf.write("https://doi.org/"+d+"\n")
 
 def parse(in_file, xml_parser: ET.XMLParser):
     return ET.parse(in_file, parser=xml_parser).getroot()
@@ -94,6 +100,8 @@ def extract_fulltext(xml, outfolder, filename):
         if not os.path.exists(os.path.dirname(outfilename)):
             os.makedirs(os.path.dirname(outfilename))
 
+        dois.append(doi)
+
         with open(outfilename, 'w', encoding="utf-8") as outf:
             outf.write("<doc>")
             outf.write("<doi>" + doi + "</doi>\n")
@@ -159,3 +167,4 @@ if __name__ == "__main__":
         print("finished")
 
     print(types)
+    save_doi(sys.argv[3], dois)
