@@ -65,16 +65,23 @@ def find_method_section(parsed_xml_root_el, gazetteer_keywords: {} = None):
 if __name__ == "__main__":
     '''
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full
-/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_schema_and_data/jdoc_2018.csv
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/original/jdoc_scopus.csv
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver6.xml
-/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_schema_and_data/jdoc_method.csv
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/abstract_replaced/jdoc_method.csv
 12
 16
 
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/full
-/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_schema_and_data/jasist.csv
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/original/jasist_scopus.csv
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver6.xml
-/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_schema_and_data/jasist_method.csv
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/abstract_replaced/jasist_method.csv
+12
+16
+
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/full
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/original/lisr_scopus.csv
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver6.xml
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/abstract_replaced/lisr_method.csv
 12
 16
     '''
@@ -115,7 +122,7 @@ if __name__ == "__main__":
 
             if method==None:
                 print("\t err: file has no method section - {}".format(file))
-                continue
+                method=""
 
             method_text=re.sub(r'\n\s+'," ", method).strip()
             row[abstract_col]=method_text

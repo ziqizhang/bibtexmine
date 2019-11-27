@@ -1,3 +1,5 @@
+#TODO: MIXED METHOD higher than other methods
+
 # processes a parsed xml file and look for features as defined in the 'initial taxonomy' (ver 24 June)
 import csv
 import glob
@@ -9,7 +11,7 @@ import sys
 import os
 from lxml import etree
 
-MIN_WORDS_IN_FULL_TEXT=500
+MIN_WORDS_IN_FULL_TEXT=100
 
 # load the gazetteer that contains keywords potentially mapping to concepts
 def load_gazetteer(file, parser):
@@ -412,17 +414,17 @@ if __name__ == "__main__":
     # for i in found:
     #     print("found")
 
-    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/abstract",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv",".xml.txt")
-
-    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/abstract",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/full",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv",".xml.txt")
+    # extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/abstract",
+    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full",
+    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
+    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv",".xml.txt")
     #
-    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/jasist_html_parsed/abstract",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/jasist_html_parsed/full_text",
+    # extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/abstract",
+    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/full",
+    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
+    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv",".xml.txt")
+    #
+    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/abstract",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/full",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jasist.csv",".txt")
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jasist.csv",".html.xml")

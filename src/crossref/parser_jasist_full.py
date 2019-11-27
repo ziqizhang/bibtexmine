@@ -23,8 +23,8 @@ def check_article_type(type):
 
 # full
 file_list = glob.glob('/home/zz/Cloud/GDrive/ziqizhang/project/'
-                      'sure2019/data/extracted_data/JASIST_(issn_2330-1635)/html/*.html')
-out_folder='/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/full/'
+                      'sure2019/data/extracted_data/JASIST_test/html/*.html')
+out_folder='/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_test/full/'
 
 count_passed = 0
 count_non_html=0

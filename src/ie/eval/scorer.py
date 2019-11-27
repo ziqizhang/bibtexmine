@@ -1,6 +1,8 @@
 import csv
 import os
 
+META_PARAM_PRINT_ERRORS=True
+
 def read_gs(in_file, col, max_rows=None, keepcls=None, keepfiles=None):
     annotations={}
     with open(in_file) as csvfile:
@@ -109,10 +111,14 @@ def score(gs:dict, pred:dict, match_all=False):
             if shared>0:
                 correct+=1
 
-        if shared!=len(multi_pred) or shared!=len(multi_gs):
+        if META_PARAM_PRINT_ERRORS and (shared!=len(multi_pred) or shared!=len(multi_gs)):
             print("article={}, gs={}, pred={}".format(i, multi_gs, multi_pred))
 
+
     for k, v in pred.items():
+        if META_PARAM_PRINT_ERRORS and k not in instances:
+            print("article={}, gs={}, pred={}".format(k, "NONE", v))
+
         pred_l = v
         multi_pred = split_by_comma(pred_l)
         if match_all:
@@ -209,16 +215,16 @@ if __name__ == "__main__":
 
 
     #keep some classes
-    keep_classes = ["questionnaire", "interview", "scientometric", "theory"]
+    #keep_classes = ["questionnaire", "interview", "scientometric", "theory"]
     #keep all classes
-    # keep_classes=["questionnaire", "interview", "scientometric", "theory",
-    #               "systematic review","network analysis","information retrieval","classification",
-    #               "clustering","information extraction","topic modelling","sentiment analysis",
-    #               "content analysis","observation","delphi study","ethnography/field study",
-    #               "netnography","experiment","focus group","historical method",
-    #               "document analysis","research diary/journal","think aloud protocol","transaction log analysis",
-    #               "user study","webometrics","social media data analysis","mixed method",
-    #               "action research","usability testing"]
+    keep_classes=["questionnaire", "interview", "scientometric", "theory",
+                  "systematic review","network analysis","information retrieval","classification",
+                  "clustering","information extraction","topic modelling","sentiment analysis",
+                  "content analysis","observation","delphi study","ethnography/field study",
+                  "netnography","experiment","focus group","historical method",
+                  "document analysis","research diary/journal","think aloud protocol","transaction log analysis",
+                  "user study","webometrics","social media data analysis","mixed method",
+                  "action research","usability testing"]
 
     print("jdoc")
     files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full"

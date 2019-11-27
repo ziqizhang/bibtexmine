@@ -48,7 +48,7 @@ for f in file_list:
             count_no_abstract+=1
             continue
 
-        abstract = element.text_content().strip()
+        abstract = escape(element.text_content().strip())
         doi = "\n<doi> " + root.find_class("epub-doi")[0].text_content() + "</doi>"
         count+=1
         # el = root.xpath("//div[@class='article__body']")
