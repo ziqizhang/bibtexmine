@@ -34,7 +34,7 @@ def check_article_type(xml):
     else:
         types[type]=1
 
-    return type.lower()=="research paper"
+    return type.lower()=="research paper" or type.lower()=="case study"
 
 def extract_doi(xml):
     doi=xml.xpath("string(//article-meta/article-id[@pub-id-type='doi'])")

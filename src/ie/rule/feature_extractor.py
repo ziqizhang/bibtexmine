@@ -206,7 +206,7 @@ def string_to_features(match_string):
 
 
 def classify_abstract_by_feature(title_matches: str, abstract_matches: str, method_matches: str,
-                                 full_matches: str, has_method=False):
+                                 full_matches: str, has_method=False, consider_method_match=True):
     decision_index = -1
     if title_matches is not None and title_matches != "n/a" and len(title_matches) > 0:
         decision_matches = title_matches
@@ -217,6 +217,8 @@ def classify_abstract_by_feature(title_matches: str, abstract_matches: str, meth
     elif method_matches is not None and method_matches != "n/a" and len(method_matches) > 0:
         decision_matches = method_matches
         decision_index = 2
+        if not consider_method_match:
+            return None, None
     else:
         return "Theory", decision_index
 
@@ -380,7 +382,10 @@ def extract_features(abstract_folder, full_text_folder, gazetter_file, outfile, 
 
             general_type, decision_index = \
                 classify_abstract_by_feature(title_matches, abstract_matches, method_matches,
-                                             full_matches, has_method)
+                                             full_matches, has_method, consider_method_match=False)
+
+            if general_type is None and decision_index is None:
+                continue
 
             if decision_index == -1:
                 line_decision[4] = "n/a"
@@ -414,15 +419,15 @@ if __name__ == "__main__":
     # for i in found:
     #     print("found")
 
-    # extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/abstract",
-    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full",
-    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
-    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv",".xml.txt")
-    #
-    # extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/abstract",
-    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/full",
-    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
-    #                  "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv",".xml.txt")
+    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/abstract",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv",".xml.txt")
+
+    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/abstract",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/full",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv",".xml.txt")
     #
     extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/abstract",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/full",

@@ -14,8 +14,8 @@ def check_article_type(type):
     return type.lower()=='research article'
 
 file_list = glob.glob('/home/zz/Cloud/GDrive/ziqizhang/project/'
-                      'sure2019/data/extracted_data/JASIST_(issn_2330-1635)/html/*.html')
-out_folder='/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/abstract/'
+                      'sure2019/data/extracted_data/new_data/JASIST/html/*.txt')
+out_folder='/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JASIST/abstract/'
 
 count = 0
 count_non_html=0

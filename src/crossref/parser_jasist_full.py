@@ -23,8 +23,8 @@ def check_article_type(type):
 
 # full
 file_list = glob.glob('/home/zz/Cloud/GDrive/ziqizhang/project/'
-                      'sure2019/data/extracted_data/JASIST_test/html/*.html')
-out_folder='/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_test/full/'
+                      'sure2019/data/extracted_data/new_data/JASIST/html/*.txt')
+out_folder='/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JASIST/full/'
 
 count_passed = 0
 count_non_html=0
@@ -41,6 +41,9 @@ for f in file_list:
 
         type=root.find_class("doi-access-container clearfix")[0].text_content().lower()
         type=type.split("\n")[0].strip()
+
+        if len(type)==0:
+            print()
         print("processing file="+f)
         print("\t article type="+type)
         if type in types:
@@ -54,6 +57,10 @@ for f in file_list:
 
         try:
             element = root.find_class("article-section article-section__full")
+            if len(element)==0:
+                print('\terr: NO FULL TEXT ')
+                count_no_ful += 1
+                continue
         except:
             print('\terr: NO FULL TEXT ')
             count_no_ful+=1
@@ -61,6 +68,7 @@ for f in file_list:
 
         doi_str=root.find_class("epub-doi")[0].text_content().strip()
         doi = "\n<doi> " + doi_str + "</doi>"
+
         full_text = element[0]
         file_name = out_folder + f.split("/")[-1] + ".xml"
 

@@ -1,7 +1,7 @@
 import csv
 import os
 
-META_PARAM_PRINT_ERRORS=True
+META_PARAM_PRINT_ERRORS=False
 
 def read_gs(in_file, col, max_rows=None, keepcls=None, keepfiles=None):
     annotations={}
@@ -164,6 +164,7 @@ def filter_(c, gs:dict):
 def score_per_type(gs:dict, pred:dict, match_all=False):
     #get the unique classes available
     unique_classes=find_all_classes(gs)
+    unique_classes=sorted(list(unique_classes))
 
     #going through each class and calculate scores
     for c in unique_classes:
@@ -188,6 +189,15 @@ def load_files2keep(file_folder):
 
     return files
 
+
+def keep_common(dict1:dict, dict2:dict):
+    shared=set(dict1.keys())
+    shared=shared.intersection(dict2.keys())
+
+    newdict1 = {k: dict1[k] for k in shared}
+    newdict2 = {k: dict2[k] for k in shared}
+
+    return newdict1, newdict2
 
 if __name__ == "__main__":
     # print("ZZ")
@@ -215,16 +225,16 @@ if __name__ == "__main__":
 
 
     #keep some classes
-    #keep_classes = ["questionnaire", "interview", "scientometric", "theory"]
+    keep_classes = ["questionnaire", "interview", "scientometric", "theory"]
     #keep all classes
-    keep_classes=["questionnaire", "interview", "scientometric", "theory",
-                  "systematic review","network analysis","information retrieval","classification",
-                  "clustering","information extraction","topic modelling","sentiment analysis",
-                  "content analysis","observation","delphi study","ethnography/field study",
-                  "netnography","experiment","focus group","historical method",
-                  "document analysis","research diary/journal","think aloud protocol","transaction log analysis",
-                  "user study","webometrics","social media data analysis","mixed method",
-                  "action research","usability testing"]
+    # keep_classes=["questionnaire", "interview", "scientometric", "theory",
+    #               "systematic review","network analysis","information retrieval","classification",
+    #               "clustering","information extraction","topic modelling","sentiment analysis",
+    #               "content analysis","observation","delphi study","ethnography/field study",
+    #               "netnography","experiment","focus group","historical method",
+    #               "document analysis","research diary/journal","think aloud protocol","transaction log analysis",
+    #               "user study","webometrics","social media data analysis","mixed method",
+    #               "action research","usability testing"]
 
     print("jdoc")
     files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full"
@@ -235,6 +245,8 @@ if __name__ == "__main__":
                  max_rows=508, keepcls=keep_classes, keepfiles=keep_files)
     pred=read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv", 4,
                          keepcls=keep_classes, keepfiles=list(gs.keys()))
+    gs, pred=keep_common(gs, pred)
+
     score_per_type(gs,pred,match_all=True)
 
     print(">>> match_all=False")
@@ -243,6 +255,8 @@ if __name__ == "__main__":
                  max_rows=508, keepcls=keep_classes, keepfiles=keep_files)
     pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv", 4,
                            keepcls=keep_classes, keepfiles=list(gs.keys()))
+    gs, pred = keep_common(gs, pred)
+
     score_per_type(gs, pred, match_all=False)
     print()
 
@@ -255,6 +269,8 @@ if __name__ == "__main__":
                  keepcls=keep_classes, keepfiles=keep_files)
     pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv", 4,
                            keepcls=keep_classes, keepfiles=list(gs.keys()))
+    gs, pred = keep_common(gs, pred)
+
     #score(gs, pred, match_all=True)
     score_per_type(gs, pred, match_all=True)
 
@@ -264,6 +280,7 @@ if __name__ == "__main__":
                  keepcls=keep_classes, keepfiles=keep_files)
     pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv", 4,
                            keepcls=keep_classes, keepfiles=list(gs.keys()))
+    gs, pred = keep_common(gs, pred)
     #score(gs, pred, match_all=False)
     score_per_type(gs, pred, match_all=False)
 

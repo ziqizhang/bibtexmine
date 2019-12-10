@@ -24,22 +24,33 @@ def parse(in_file, xml_parser: ET.XMLParser):
 def check_article_type(xml, namespaces:dict):
     type=xml.xpath("string(//xocs:meta/xocs:document-type)", namespaces=namespaces)
     subtype=xml.xpath("string(//xocs:meta/xocs:document-subtype)", namespaces=namespaces)
-    if type is None:
+    if type is None or len(type)==0:
+        try:
+            type=xml.xpath("//article[@article-type]")[0].attrib['article-type']
+        except:
+            type=""
+    if type is None or len(type)==0:
         return False
     else:
         print("\tarticle type="+subtype)
-        if subtype is not None:
-            if subtype in types:
-                types[subtype] += 1
-            else:
-                types[subtype] = 1
+        if subtype is None or len(subtype)==0:
+            subtype=type
 
-            return type.lower()=="article" and subtype.lower()=="fla"
+        if subtype in types:
+            types[subtype] += 1
         else:
-            return False
+            types[subtype] = 1
+
+        if type.lower()=="article" and subtype.lower()=="fla":
+            return True
+        if type.lower()=="research-article":
+            return True
+        return False
 
 def extract_doi(xml,namespaces:dict):
     doi=xml.xpath("string(//dtd:coredata/prism:doi)",namespaces=namespaces)
+    if len(doi)==0:
+        doi=xml.xpath("string(//article/front/article-meta/article-id[@pub-id-type='doi'])")
     return doi
 
 def extract_abstract(xml, outfolder, filename, namespaces:dict):
@@ -47,6 +58,8 @@ def extract_abstract(xml, outfolder, filename, namespaces:dict):
     abstract=xml.xpath("string(//dtd:coredata/dc:description)",namespaces=namespaces)
     if abstract is None or len(abstract) ==0:
         abstract = xml.xpath("string(//ce:abstract)", namespaces=namespaces)
+    if abstract is None or len(abstract)==0:
+        abstract = xml.xpath("string(//article/front/article-meta/abstract)")
 
     if abstract is not None and len(abstract)>0:
         outfilename = outfolder + "/abstract/" + filename
@@ -116,7 +129,45 @@ def extract_fulltext(xml, outfolder, filename,namespaces:dict):
 
                 outf.write("</doc>")
                 outf.close()
+        else:
+            body_secs = xml.xpath("//body/sec")
+            if body_secs is not None and len(body_secs) > 0:
+                outfilename = outfolder + "/full/" + filename
+                if not os.path.exists(os.path.dirname(outfilename)):
+                    os.makedirs(os.path.dirname(outfilename))
 
+                dois.append(doi)
+
+                with open(outfilename, 'w', encoding="utf-8") as outf:
+                    outf.write("<doc>")
+                    outf.write("<doi>" + doi + "</doi>\n")
+                    # outf.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+                    # for each section
+                    for i in range(1, len(body_secs) + 1):
+                        # section title
+                        title = xml.xpath('string(//body/sec[' + str(i) + ']/title)').strip()
+                        if title is not None and len(title) > 0:
+                            out_string = '<sec title="' + escape(title) + '">\n'
+                        else:
+                            out_string = "<sec>\n"
+
+                        outf.write(out_string)
+                        # section content
+                        sec_para = xml.xpath("//body/sec[" + str(i) + "]//text()")
+                        if len(sec_para) < 1:
+                            continue
+                        text = "".join(sec_para).strip()
+                        # for j in range(1, len(sec_para) + 1):
+                        #     text = xml.xpath(
+                        #         'string(//body/sec[' + str(i) + ']/p[' + str(j) + '])').strip()
+                        #     if len(text)>1:
+                        #         text="<p>"+escape(text)+"</p>\n"
+                        #     out_string+=text
+
+                        outf.write(escape(text))
+                        outf.write("</sec>\n")
+                    outf.write("</doc>")
+                    outf.close()
 
 if __name__ == "__main__":
     parser = etree.XMLParser(recover=True)
