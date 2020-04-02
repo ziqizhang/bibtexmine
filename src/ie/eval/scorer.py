@@ -200,6 +200,8 @@ def keep_common(dict1:dict, dict2:dict):
     return newdict1, newdict2
 
 if __name__ == "__main__":
+    #features_extracted_inclmethodsec
+
     # print("ZZ")
     # #when multiple predictions, keep all; when multiple gs, keep all
     # gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6, max_rows=508)
@@ -225,62 +227,63 @@ if __name__ == "__main__":
 
 
     #keep some classes
-    keep_classes = ["questionnaire", "interview", "scientometric", "theory"]
+    #keep_classes = ["questionnaire", "interview", "scientometric", "theory"]
     #keep all classes
-    # keep_classes=["questionnaire", "interview", "scientometric", "theory",
-    #               "systematic review","network analysis","information retrieval","classification",
-    #               "clustering","information extraction","topic modelling","sentiment analysis",
-    #               "content analysis","observation","delphi study","ethnography/field study",
-    #               "netnography","experiment","focus group","historical method",
-    #               "document analysis","research diary/journal","think aloud protocol","transaction log analysis",
-    #               "user study","webometrics","social media data analysis","mixed method",
-    #               "action research","usability testing"]
+    keep_classes=["questionnaire", "interview", "scientometric", "theory",
+                   "systematic review","network analysis","information retrieval","classification",
+                   "clustering","information extraction","topic modelling","sentiment analysis",
+                   "content analysis","observation","delphi study","ethnography/field study",
+                   "netnography","experiment","focus group","historical method",
+                   "document analysis","research diary/journal","think aloud protocol","transaction log analysis",
+                   "user study","webometrics","social media data analysis","mixed method",
+                   "action research","usability testing"]
 
     print("jdoc")
-    files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full"
+    files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JDOC/xml_parsed/full"
     keep_files = load_files2keep(files)
-    print(">>> match_all=True")
-    #when multiple predictions, keep all; when multiple gs, keep all
-    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6,
-                 max_rows=508, keepcls=keep_classes, keepfiles=keep_files)
-    pred=read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv", 4,
-                         keepcls=keep_classes, keepfiles=list(gs.keys()))
-    gs, pred=keep_common(gs, pred)
-
-    score_per_type(gs,pred,match_all=True)
+    # print(">>> match_all=True")
+    # #when multiple predictions, keep all; when multiple gs, keep all
+    # gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6,
+    #              max_rows=508, keepcls=keep_classes, keepfiles=keep_files)
+    # pred=read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv", 4,
+    #                      keepcls=keep_classes, keepfiles=list(gs.keys()))
+    # gs, pred=keep_common(gs, pred)
+    #
+    # score_per_type(gs,pred,match_all=True)
 
     print(">>> match_all=False")
     # when multiple predictions, keep the highest; when multiple gs, as long as one matches
     gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6,
                  max_rows=508, keepcls=keep_classes, keepfiles=keep_files)
-    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv", 4,
+    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/features_extracted_nomethodsec/jdoc.csv", 4,
                            keepcls=keep_classes, keepfiles=list(gs.keys()))
     gs, pred = keep_common(gs, pred)
 
     score_per_type(gs, pred, match_all=False)
+    score(gs, pred, match_all=False)
     print()
 
     print("lisr")
-    files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/full"
+    files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/LISR/xml_parsed/full"
     keep_files = load_files2keep(files)
-    print(">>> match_all=True")
-    # when multiple predictions, keep all; when multiple gs, keep all
-    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT_AC.csv", 6, max_rows=653,
-                 keepcls=keep_classes, keepfiles=keep_files)
-    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv", 4,
-                           keepcls=keep_classes, keepfiles=list(gs.keys()))
-    gs, pred = keep_common(gs, pred)
-
-    #score(gs, pred, match_all=True)
-    score_per_type(gs, pred, match_all=True)
+    # print(">>> match_all=True")
+    # # when multiple predictions, keep all; when multiple gs, keep all
+    # gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT_AC.csv", 6, max_rows=653,
+    #              keepcls=keep_classes, keepfiles=keep_files)
+    # pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv", 4,
+    #                        keepcls=keep_classes, keepfiles=list(gs.keys()))
+    # gs, pred = keep_common(gs, pred)
+    #
+    # #score(gs, pred, match_all=True)
+    # score_per_type(gs, pred, match_all=True)
 
     print(">>> match_all=False")
     # when multiple predictions, keep the highest; when multiple gs, as long as one matches
     gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT_AC.csv", 6, max_rows=653,
                  keepcls=keep_classes, keepfiles=keep_files)
-    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv", 4,
+    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/features_extracted_nomethodsec/lisr.csv", 4,
                            keepcls=keep_classes, keepfiles=list(gs.keys()))
     gs, pred = keep_common(gs, pred)
     #score(gs, pred, match_all=False)
     score_per_type(gs, pred, match_all=False)
-
+    score(gs, pred, match_all=False)

@@ -70,7 +70,13 @@ for f in file_list:
         doi = "\n<doi> " + doi_str + "</doi>"
 
         full_text = element[0]
-        file_name = out_folder + f.split("/")[-1] + ".xml"
+        title = f.split("/")[-1]
+        try:
+            title = root.findall("./head/meta[@name='citation_title']")[0].get('content')
+        except:
+            print("\tcannot parse title of the paper")
+
+        file_name = out_folder + title.replace("/","_").strip() + ".xml"
 
         outf = ""
         for i in full_text[:-1]:

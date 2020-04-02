@@ -7,7 +7,6 @@ import operator
 import re
 import xml.etree.cElementTree as ET
 
-import sys
 import os
 from lxml import etree
 
@@ -348,34 +347,37 @@ def extract_features(abstract_folder, full_text_folder, gazetter_file, outfile, 
             full_matches = None
             if os.path.isfile(fulltext_file):
                 # method section
-                tree = ET.parse(fulltext_file, parser).getroot()
-                method_section, has_method, section_titles = find_all_sections(tree,
-                                                                               gazetteer_keywords=gazetteer_keyword,
-                                                                               methodseconly=True)
-                if has_method:
-                    line_method[1] = "True"
-                    method_matches, method_matches_sum = extract_features_non_zero_only(method_section,
-                                                                                        gazetteer_keywords=gazetteer_keyword,
-                                                                                        gazetteer_patterns=gazetteer_pattern)
-                    line_method[4] = method_matches
-                    line_method[5] = method_matches_sum
-                else:
-                    line_method[4] = "n/a"
-                    line_method[5] = "0"
+                try:
+                    tree = ET.parse(fulltext_file, parser).getroot()
+                    method_section, has_method, section_titles = find_all_sections(tree,
+                                                                                   gazetteer_keywords=gazetteer_keyword,
+                                                                                   methodseconly=True)
+                    if has_method:
+                        line_method[1] = "True"
+                        method_matches, method_matches_sum = extract_features_non_zero_only(method_section,
+                                                                                            gazetteer_keywords=gazetteer_keyword,
+                                                                                            gazetteer_patterns=gazetteer_pattern)
+                        line_method[4] = method_matches
+                        line_method[5] = method_matches_sum
+                    else:
+                        line_method[4] = "n/a"
+                        line_method[5] = "0"
 
-                # full text
-                fulltext, has_method, section_titles = find_all_sections(tree,
-                                                                         gazetteer_keywords=gazetteer_keyword,
-                                                                         methodseconly=False)
-                full_matches, full_matches_sum = extract_features_non_zero_only(fulltext,
-                                                                                gazetteer_keywords=gazetteer_keyword,
-                                                                                gazetteer_patterns=gazetteer_pattern)
-                line_full[4] = full_matches
-                line_full[5] = full_matches_sum
+                    # full text
+                    fulltext, has_method, section_titles = find_all_sections(tree,
+                                                                             gazetteer_keywords=gazetteer_keyword,
+                                                                             methodseconly=False)
+                    full_matches, full_matches_sum = extract_features_non_zero_only(fulltext,
+                                                                                    gazetteer_keywords=gazetteer_keyword,
+                                                                                    gazetteer_patterns=gazetteer_pattern)
+                    line_full[4] = full_matches
+                    line_full[5] = full_matches_sum
 
-                #extract doi from body text
-                if doi is None or doi=="":
-                    doi = find_doi(tree)
+                    #extract doi from body text
+                    if doi is None or doi=="":
+                        doi = find_doi(tree)
+                except:
+                    print("failed")
 
             output_doi(doi,doi_writer)
             # classify into theory, methodological, empirical, also decision which of title, abs, method, full text to use for decision
@@ -419,17 +421,17 @@ if __name__ == "__main__":
     # for i in found:
     #     print("found")
 
-    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/abstract",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JDOC/xml_parsed/full",
+    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JDOC/xml_parsed/abstract",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JDOC/xml_parsed/full",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv",".xml.txt")
 
-    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/abstract",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/LISR/xml_parsed/full",
+    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/LISR/xml_parsed/abstract",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/LISR/xml_parsed/full",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv",".xml.txt")
     #
-    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/abstract",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/JASIST_(issn_2330-1635)/full",
+    extract_features("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JASIST/abstract",
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JASIST/full",
                      "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml",
-                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jasist.csv",".html.xml")
+                     "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jasist.csv",".xml")

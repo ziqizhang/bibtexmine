@@ -142,7 +142,7 @@ if __name__ == "__main__":
     # print(file_list)
     count = 0
     for f in file_list:
-        filename = f.split("/")[-1] + '.txt'
+        filename = f.split("/")[-1].strip() + '.txt'
 
         if 'model of uncertainty ' in filename:
             print()

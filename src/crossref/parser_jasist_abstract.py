@@ -54,7 +54,12 @@ for f in file_list:
         # el = root.xpath("//div[@class='article__body']")
         # the id content
         # print (element.text_content())
-        file_name = out_folder+f.split("/")[-1]+".xml"
+        title=f.split("/")[-1]
+        try:
+            title=root.findall("./head/meta[@name='citation_title']")[0].get('content')
+        except:
+            print("\tcannot parse title of the paper")
+        file_name = out_folder+title.replace("/","_").strip() + ".xml"
 
         # print(element.text_content())
         with open((file_name), 'wb+') as file:
