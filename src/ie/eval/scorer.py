@@ -230,13 +230,13 @@ if __name__ == "__main__":
     #keep_classes = ["questionnaire", "interview", "scientometric", "theory"]
     #keep all classes
     keep_classes=["questionnaire", "interview", "scientometric", "theory",
-                   "systematic review","network analysis","information retrieval","classification",
+                   "network analysis","classification",
                    "clustering","information extraction","topic modelling","sentiment analysis",
                    "content analysis","observation","delphi study","ethnography/field study",
                    "netnography","experiment","focus group","historical method",
                    "document analysis","research diary/journal","think aloud protocol","transaction log analysis",
-                   "user study","webometrics","social media data analysis","mixed method",
-                   "action research","usability testing"]
+                   "user study","mixed method",
+                   "usability testing","annotation","experiment","statistical studies","regression studies"]
 
     print("jdoc")
     files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JDOC/xml_parsed/full"

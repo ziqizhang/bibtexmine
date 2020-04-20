@@ -28,7 +28,7 @@ def load_annotations(in_file, col, keepcls):
 
             ann = row[col].strip()
             str=""
-            for a in ann.split(","):
+            for a in ann.split("|"):
                 str+=a.split("=")[0]+","
             str=str[0:-1]
             if keepcls is not None:
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     '''
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JDOC/xml_parsed/full
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/original/jdoc_scopus.csv
-/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver9.xml
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/abstract_replaced/jdoc_method.csv
 12
 16
@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JASIST/full
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/original/jasist_2008_2014_all.csv
-/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver9.xml
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/abstract_replaced/jasist_method_2008_2014.csv
 12
 16
@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JASIST/full
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/original/jasist_2014_2018_all.csv
-/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver9.xml
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/abstract_replaced/jasist_method_2014_2018.csv
 12
 16
@@ -139,13 +139,14 @@ if __name__ == "__main__":
 
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/LISR/xml_parsed/full
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/original/lisr_scopus.csv
-/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver7.xml
+/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/taxonomy/taxonomy_ver9.xml
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/scopus_data/abstract_replaced/lisr_method.csv
 12
 16
 /home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/lisr.csv
     '''
-    fileext=".xml"
+    #fileext=".xml.txt" #use this for jdoc and lisr
+    fileext=".xml" #this for jaisis
     #create the doi-file name map
     map_doi, map_name=map_parsed_xml(sys.argv[1])
 
@@ -168,7 +169,7 @@ if __name__ == "__main__":
     doi_col=int(sys.argv[5])
     abstract_col = int(sys.argv[6])
 
-    method_annotation=load_annotations(sys.argv[7], col=4, keepcls=["interview","questionnaire"])
+    method_annotation=load_annotations(sys.argv[7], col=4, keepcls=["interview","questionnaire","scientometric"])
 
     count_has_method=0
     count_total=0
