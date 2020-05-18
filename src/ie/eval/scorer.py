@@ -3,7 +3,7 @@ import os
 
 META_PARAM_PRINT_ERRORS=False
 
-def read_gs(in_file, col, max_rows=None, keepcls=None, keepfiles=None):
+def read_gs(in_file, col, max_rows=None, keepcls=None, keepfiles=None, trim_file_name=-1):
     annotations={}
     with open(in_file) as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',')
@@ -18,12 +18,17 @@ def read_gs(in_file, col, max_rows=None, keepcls=None, keepfiles=None):
             if len(row[0])==0:
                 continue
 
+            g_file=row[0]
+            if trim_file_name>-1:
+                g_file=g_file[0:trim_file_name].strip()
+
             ann = row[col].strip()
             if keepcls is not None:
                 ann=replace_with_other(ann, keepcls)
-            if keepfiles is not None and not row[0] in keepfiles:
-                continue
-            annotations[row[0]]=ann
+            if keepfiles is not None:
+                if g_file not in keepfiles:
+                    continue
+            annotations[g_file]=ann
 
     return annotations
 
@@ -43,8 +48,10 @@ def replace_with_other(pred_, keep):
     return string[0:-1].strip()
 
 
-def read_prediction(in_file, col, keepcls=None, keepfiles=None):
+def read_prediction(in_file, col, keepcls=None, keepfiles=None,trim_file_name=-1):
+    l1 = sorted(keepfiles)
     predictions = {}
+    pred_files=[]
     with open(in_file) as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',')
         count = 0
@@ -52,9 +59,14 @@ def read_prediction(in_file, col, keepcls=None, keepfiles=None):
             count += 1
             if count == 1:
                 continue
-            if len(row[0]) == 0:
+
+            p_file=row[0].strip()
+            if len(p_file) == 0:
                 continue
             pred=row[col]
+
+            if trim_file_name>-1:
+                p_file=p_file[0:trim_file_name].strip()
 
             pred_ = ""
 
@@ -62,11 +74,17 @@ def read_prediction(in_file, col, keepcls=None, keepfiles=None):
                 pred_+=p.split("=")[0]+","
             pred_ = pred_[:-1]
 
+            pred_files.append(p_file)
             if keepcls is not None:
                 pred_ = replace_with_other(pred_, keepcls)
-            if keepfiles is not None and not row[0] in keepfiles:
-                continue
-            predictions[row[0]] = pred_
+            if l1 is not None:
+                if p_file not in l1:
+                    continue
+            predictions[p_file] = pred_
+
+
+    l2=sorted(pred_files)
+
     return predictions
 
 #*args = filter labels
@@ -147,6 +165,8 @@ def find_all_classes(gs:dict):
     classes=set()
     for v in gs.values():
         multi_gs = split_by_comma(v)
+        if '' in multi_gs:
+            print("")
         classes.update(multi_gs)
 
     return classes
@@ -168,9 +188,9 @@ def score_per_type(gs:dict, pred:dict, match_all=False):
 
     #going through each class and calculate scores
     for c in unique_classes:
-        print("CLASS={}".format(c), end='')
-        filtered_gs=filter_(c, gs)
-        filtered_pred=filter_(c, pred)
+        filtered_gs = filter_(c, gs)
+        filtered_pred = filter_(c, pred)
+        print("CLASS={} #={}".format(c,len(filtered_gs)), end='')
         score(filtered_gs, filtered_pred, match_all)
 
 
@@ -229,18 +249,19 @@ if __name__ == "__main__":
     #keep some classes
     #keep_classes = ["questionnaire", "interview", "scientometric", "theory"]
     #keep all classes
-    keep_classes=["questionnaire", "interview", "scientometric", "theory",
-                   "network analysis","classification",
-                   "clustering","information extraction","topic modelling","sentiment analysis",
-                   "content analysis","observation","delphi study","ethnography/field study",
-                   "netnography","experiment","focus group","historical method",
-                   "document analysis","research diary/journal","think aloud protocol","transaction log analysis",
-                   "user study","mixed method",
-                   "usability testing","annotation","experiment","statistical studies","regression studies"]
+    # keep_classes=["questionnaire", "interview", "scientometric", "theory",
+    #                "network analysis","classification",
+    #                "clustering","information extraction","topic modelling","sentiment analysis",
+    #                "content analysis","observation","delphi study","ethnography/field study",
+    #                "netnography","experiment","focus group","historical method",
+    #                "document analysis","research diary/journal","think aloud protocol","transaction log analysis",
+    #                "user study","mixed method",
+    #                "usability testing","annotation","experiment","statistical studies","regression studies"]
+    keep_classes=None
 
-    print("jdoc")
+    print(">>>>> jdoc")
     files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JDOC/xml_parsed/full"
-    keep_files = load_files2keep(files)
+    keep_files = sorted(load_files2keep(files))
     # print(">>> match_all=True")
     # #when multiple predictions, keep all; when multiple gs, keep all
     # gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6,
@@ -253,19 +274,20 @@ if __name__ == "__main__":
 
     print(">>> match_all=False")
     # when multiple predictions, keep the highest; when multiple gs, as long as one matches
-    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6,
-                 max_rows=508, keepcls=keep_classes, keepfiles=keep_files)
-    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/features_extracted_nomethodsec/jdoc.csv", 4,
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ_new+.csv", 6,
+                 max_rows=555, keepcls=keep_classes, keepfiles=keep_files)
+    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/features_extracted_inclmethodsec/jdoc_ver10.csv", 4,
                            keepcls=keep_classes, keepfiles=list(gs.keys()))
     gs, pred = keep_common(gs, pred)
+    print(len(gs))
 
     score_per_type(gs, pred, match_all=False)
     score(gs, pred, match_all=False)
     print()
 
-    print("lisr")
+    print(">>>>> lisr")
     files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/LISR/xml_parsed/full"
-    keep_files = load_files2keep(files)
+    keep_files = sorted(load_files2keep(files))
     # print(">>> match_all=True")
     # # when multiple predictions, keep all; when multiple gs, keep all
     # gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT_AC.csv", 6, max_rows=653,
@@ -279,11 +301,40 @@ if __name__ == "__main__":
 
     print(">>> match_all=False")
     # when multiple predictions, keep the highest; when multiple gs, as long as one matches
-    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT_AC.csv", 6, max_rows=653,
-                 keepcls=keep_classes, keepfiles=keep_files)
-    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/features_extracted_nomethodsec/lisr.csv", 4,
-                           keepcls=keep_classes, keepfiles=list(gs.keys()))
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/lisr_WT_AC_new+.csv", 6, max_rows=625,
+                 keepcls=keep_classes, keepfiles=keep_files, trim_file_name=85)
+    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/features_extracted_inclmethodsec/lisr_ver10.csv", 4,
+                           keepcls=keep_classes, keepfiles=list(gs.keys()), trim_file_name=85)
     gs, pred = keep_common(gs, pred)
+    print(len(gs))
     #score(gs, pred, match_all=False)
     score_per_type(gs, pred, match_all=False)
     score(gs, pred, match_all=False)
+
+
+
+    print(">>>>> jasist")
+    files = "/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_data/new_data/JASIST/full"
+    keep_files = sorted(load_files2keep(files))
+    # print(">>> match_all=True")
+    # #when multiple predictions, keep all; when multiple gs, keep all
+    # gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jdoc_ZZ.csv", 6,
+    #              max_rows=508, keepcls=keep_classes, keepfiles=keep_files)
+    # pred=read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/jdoc.csv", 4,
+    #                      keepcls=keep_classes, keepfiles=list(gs.keys()))
+    # gs, pred=keep_common(gs, pred)
+    #
+    # score_per_type(gs,pred,match_all=True)
+
+    print(">>> match_all=False")
+    # when multiple predictions, keep the highest; when multiple gs, as long as one matches
+    gs = read_gs("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/goldstandard/jasist_ZZ_new+.csv", 6,
+                 max_rows=518, keepcls=keep_classes, keepfiles=keep_files)
+    pred = read_prediction("/home/zz/Cloud/GDrive/ziqizhang/project/sure2019/data/extracted_feature/features_extracted_inclmethodsec/jasist_ver10.csv", 4,
+                           keepcls=keep_classes, keepfiles=list(gs.keys()))
+    gs, pred = keep_common(gs, pred)
+    print(len(gs))
+
+    score_per_type(gs, pred, match_all=False)
+    score(gs, pred, match_all=False)
+    print()

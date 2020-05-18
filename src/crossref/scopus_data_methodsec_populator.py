@@ -171,7 +171,7 @@ if __name__ == "__main__":
 
     method_annotation=load_annotations(sys.argv[7], col=4, keepcls=["interview","questionnaire","scientometric"])
 
-    count_has_method=0
+    count_has_no_method=0
     count_total=0
     with open(new_scopus_data_file, mode='w') as outfile:
         outfile_writer = csv.writer(outfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -189,7 +189,7 @@ if __name__ == "__main__":
                 method=find_method_section(xml, gazetteer_keyword)
                 count_total+=1
                 if method==None:
-                    count_has_method+=1
+                    count_has_no_method+=1
                     print("\t err: file has no method section - {}".format(file))
                     method=""
 
@@ -212,5 +212,5 @@ if __name__ == "__main__":
                 print("error:"+file)
             outfile_writer.writerow(row)
 
-    print(count_has_method)
+    print(count_has_no_method)
     print(count_total)
